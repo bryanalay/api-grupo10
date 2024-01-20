@@ -1,83 +1,60 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Xml.Linq;
+using TallerTecnico;
 
 namespace api_grupo10.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class OrdenesController : Controller
     {
-        // GET: OrdenesController
-        public ActionResult Index()
+        [Route("[action]")]
+        [HttpGet]
+        public async Task<ActionResult<Orden>> OrdenesTr(string transaction)
         {
-            return View();
-        }
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
 
-        // GET: OrdenesController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: OrdenesController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: OrdenesController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            Orden inv = new Orden
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                Transaccion = transaction
+            };
 
-        // GET: OrdenesController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetOrden", cadenaConexion, transaction, xmlParam.ToString());
+            List<Orden> ordList = new List<Orden>();
 
-        // POST: OrdenesController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            if (dbResult.Tables.Count > 0)
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        Console.WriteLine(dbResult.Tables[0].Rows.Count.ToString());
+                        Orden invent = new Orden
+                        {
+                            Id = Convert.ToInt32(row["id"]),
+                            Tarea = row["tarea"].ToString(),
+                            Fecha = row["fecha"].ToString(),
+                            Estado = row["estado"].ToString(),
+                            Cliente = row["cliente"].ToString(),
+                            EmpleadoAsignado = row["empleado_asignado"].ToString(),
 
-        // GET: OrdenesController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+                        };
+                        ordList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: ", ex);
+                }
+            }
 
-        // POST: OrdenesController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return Ok(ordList);
         }
     }
 }

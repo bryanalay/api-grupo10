@@ -4,12 +4,12 @@ namespace TallerTecnico
 {
     public class Orden
     {
-        [Key]int Id { get; set; }
-        string? Tarea { get; set; }
-        string? Fecha { get; set; }
-        string? Estado { get; set; }
-        string? Cliente { get; set; }
-        string? EmpleadoAsignado { get; set; }
-        string? Transaccion { get; set; }
+        [Key]public int Id { get; set; }
+        public string? Tarea { get; set; }
+        public string? Fecha { get; set; }
+        public string? Estado { get; set; }
+        public string? Cliente { get; set; }
+        public string? EmpleadoAsignado { get; set; }
+        public string? Transaccion { get; set; }
     }
 }

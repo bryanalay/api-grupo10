@@ -4,10 +4,10 @@ namespace TallerTecnico
 {
     public class InventarioPiezas
     {
-        [Key]int Id { get; set; }
-        string? Nombre { get; set; }
-        string? Descripcion {  get; set; }
-        int Cantidad { get; set; }
-        string? Transaccion { get; set; }
+        [Key]public int Id { get; set; }
+        public string? Nombre { get; set; }
+        public string? Descripcion {  get; set; }
+        public int Cantidad { get; set; }
+        public string? Transaccion { get; set; }
     }
 }

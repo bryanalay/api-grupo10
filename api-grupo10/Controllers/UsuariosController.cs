@@ -1,83 +1,106 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Diagnostics;
+using System.Xml.Linq;
+using TallerTecnico;
 
 namespace api_grupo10.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class UsuariosController : Controller
     {
-        // GET: UsuariosController
-        public ActionResult Index()
+        [Route("[action]")]
+        [HttpGet]
+        public async Task<ActionResult<Usuario>> UsuarioTr(string transaction)
         {
-            return View();
-        }
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
 
-        // GET: UsuariosController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: UsuariosController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: UsuariosController/Create
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
-        {
-            try
+            Usuario inv = new Usuario
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
+                Transaccion = transaction
+            };
+
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetUsuario", cadenaConexion, transaction, xmlParam.ToString());
+            List<Usuario> userList = new List<Usuario>();
+
+            if (dbResult.Tables.Count > 0)
             {
-                return View();
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        Console.WriteLine(dbResult.Tables[0].Rows.Count.ToString());
+                        Usuario invent = new Usuario
+                        {
+                            Id = Convert.ToInt32(row["id"]),
+                            Nombre = row["nombre"].ToString(),
+                            Cedula = row["cedula"].ToString(),
+                            Celular = row["celular"].ToString(),
+                            Correo = row["correo"].ToString(),
+                            Password = row["password"].ToString(),
+
+                        };
+                        userList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: ", ex);
+                }
             }
+
+            return Ok(userList);
         }
 
-        // GET: UsuariosController/Edit/5
-        public ActionResult Edit(int id)
+        [Route("[action]")]
+        [HttpGet]
+        public async Task<ActionResult<RespuestaLeyenda>> UsuarioLogin(string username, string password, string transaction)
         {
-            return View();
-        }
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
 
-        // POST: UsuariosController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
+            Usuario inv = new Usuario
             {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+                Nombre = username,
+                Password = password,
+                Transaccion = transaction,
+            };
 
-        // GET: UsuariosController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetUsuario", cadenaConexion, transaction, xmlParam.ToString());
+            List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
 
-        // POST: UsuariosController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
+            if (dbResult.Tables.Count > 0)
             {
-                return RedirectToAction(nameof(Index));
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        Console.WriteLine(dbResult.Tables[0].Rows.Count.ToString());
+                        RespuestaLeyenda invent = new()
+                        {
+                            Respuesta = row["respuesta"].ToString(),
+                            Leyenda = row["leyenda"].ToString(),
+                        };
+                        Console.WriteLine(invent);
+                        msgList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: ", ex);
+                }
             }
-            catch
-            {
-                return View();
-            }
+
+            return Ok(msgList);
         }
     }
 }

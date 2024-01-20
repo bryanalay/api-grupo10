@@ -1,83 +1,96 @@
 ﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
+using System.Data;
+using System.Xml.Linq;
+using TallerTecnico;
 
 namespace api_grupo10.Controllers
 {
+    [Route("api/[controller]")]
+    [ApiController]
     public class InventarioController : Controller
     {
-        // GET: InventarioController
-        public ActionResult Index()
+        [Route("[action]")]
+        [HttpGet]
+        public async Task<ActionResult<InventarioPiezas>> InventarioTr(string transaction)
         {
-            return View();
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
+
+            InventarioPiezas inv = new InventarioPiezas
+            {
+                Transaccion = transaction
+            };
+
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetInventario", cadenaConexion,transaction,xmlParam.ToString());
+            List<InventarioPiezas> invList = new List<InventarioPiezas>();
+
+            if(dbResult.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach(DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        Console.WriteLine(dbResult.Tables[0].Rows.Count.ToString());
+                        InventarioPiezas invent = new InventarioPiezas
+                        {
+                            Id = Convert.ToInt32(row["id"]),
+                            Nombre = row["nombre"].ToString(),
+                            Descripcion = row["descripcion"].ToString(),
+                            Cantidad = Convert.ToInt32(row["cantidad"])
+                        };
+                        invList.Add(invent);
+                    }
+                }
+                catch(Exception ex)
+                {
+                    Console.WriteLine("Error: ",ex);
+                }
+            }
+
+            return Ok(invList);
         }
 
-        // GET: InventarioController/Details/5
-        public ActionResult Details(int id)
-        {
-            return View();
-        }
-
-        // GET: InventarioController/Create
-        public ActionResult Create()
-        {
-            return View();
-        }
-
-        // POST: InventarioController/Create
+        [Route("[action]")]
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Create(IFormCollection collection)
+        public async Task<ActionResult<RespuestaLeyenda>> PostInventario(InventarioPiezas inv)
         {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
 
-        // GET: InventarioController/Edit/5
-        public ActionResult Edit(int id)
-        {
-            return View();
-        }
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetInventario", cadenaConexion, inv.Transaccion, xmlParam.ToString());
+            List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
 
-        // POST: InventarioController/Edit/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Edit(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
-        }
 
-        // GET: InventarioController/Delete/5
-        public ActionResult Delete(int id)
-        {
-            return View();
-        }
+            if (dbResult.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        RespuestaLeyenda invent = new()
+                        {
+                            Respuesta = row["respuesta"].ToString(),
+                            Leyenda = row["leyenda"].ToString(),
+                        };
+                        Console.WriteLine(invent);
+                        msgList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error en api: ", ex.ToString());
+                }
+            }
 
-        // POST: InventarioController/Delete/5
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public ActionResult Delete(int id, IFormCollection collection)
-        {
-            try
-            {
-                return RedirectToAction(nameof(Index));
-            }
-            catch
-            {
-                return View();
-            }
+            return Ok(msgList);
         }
     }
 }
