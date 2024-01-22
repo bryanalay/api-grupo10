@@ -39,7 +39,7 @@ namespace api_grupo10.Controllers
             };
 
             XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
-            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetUsuario", cadenaConexion, transaction, xmlParam.ToString());
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getUsuarios, cadenaConexion, transaction, xmlParam.ToString());
             List<Usuario> userList = new List<Usuario>();
 
             if (dbResult.Tables.Count > 0)
@@ -88,7 +88,7 @@ namespace api_grupo10.Controllers
             //};
 
             XDocument xmlParam = Shared.DBXmlMethods.GetXml(usr);
-            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetUsuario", cadenaConexion, usr.Transaccion, xmlParam.ToString());
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getUsuarios, cadenaConexion, usr.Transaccion, xmlParam.ToString());
             List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
 
 

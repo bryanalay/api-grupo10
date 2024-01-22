@@ -34,6 +34,35 @@ BEGIN
 			SET @leyenda = 'Se guardo '+@nombre+' correctamente';
 		END
 
+		IF(@Transaccion = 'DELETE_INVENTARIO_BY_ID')
+		BEGIN
+			
+			SET @id = (select @XML.value('(/InventarioPiezas/Id)[1]','INT'))
+
+			DELETE FROM inventario where id = @id;
+
+			SET @respuesta = 'Ok';
+			SET @leyenda = 'Se elimino producto correctamente';
+		END
+
+		IF(@Transaccion = 'UPDATE_INVENTARIO_BY_ID')
+		BEGIN
+			SET @nombre = (select @XML.value('(/InventarioPiezas/Nombre)[1]','varchar(50)'))
+			SET @descripcion = (select @XML.value('(/InventarioPiezas/Descripcion)[1]','varchar(50)'))
+			SET @cantidad = (select @XML.value('(/InventarioPiezas/Cantidad)[1]','INT'))
+			SET @id = (select @XML.value('(/InventarioPiezas/Id)[1]','int'))
+			UPDATE orden
+			SET 
+				nombre = @nombre,
+				descripcion = @descripcion,
+				cantidad = @cantidad,
+
+			WHERE id = @id;
+
+			SET @respuesta = 'Ok';
+			SET @leyenda = 'Se actualizo item con id '+CAST(@id AS VARCHAR)+' correctamente';
+		END
+
 	END TRY
 	BEGIN CATCH
 	END CATCH

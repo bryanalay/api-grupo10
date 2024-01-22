@@ -28,7 +28,7 @@ namespace api_grupo10.Controllers
             };
 
             XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
-            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetInventario", cadenaConexion,transaction,xmlParam.ToString());
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getInventario, cadenaConexion,transaction,xmlParam.ToString());
             List<InventarioPiezas> invList = new List<InventarioPiezas>();
 
             if(dbResult.Tables.Count > 0)
@@ -56,6 +56,49 @@ namespace api_grupo10.Controllers
 
             return Ok(invList);
         }
+        
+        [Route("[action]")]
+        [HttpDelete]
+        public async Task<ActionResult<RespuestaLeyenda>> DeleteInventario(string transaction,int id)
+        {
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
+
+            InventarioPiezas inv = new InventarioPiezas
+            {
+                Id = id,
+                Transaccion = transaction
+            };
+
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getInventario, cadenaConexion, transaction, xmlParam.ToString());
+            List<RespuestaLeyenda> invList = new List<RespuestaLeyenda>();
+
+            if (dbResult.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        Console.WriteLine(dbResult.Tables[0].Rows.Count.ToString());
+                        RespuestaLeyenda invent = new RespuestaLeyenda
+                        {
+                            Respuesta = row["respuesta"].ToString(),
+                            Leyenda = row["leyenda"].ToString(),
+                        };
+                        invList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error: ", ex);
+                }
+            }
+
+            return Ok(invList);
+        }
 
         [Route("[action]")]
         [HttpPost]
@@ -67,7 +110,7 @@ namespace api_grupo10.Controllers
                 .GetSection("ConnectionStrings")["Conexion"];
 
             XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
-            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase("GetInventario", cadenaConexion, inv.Transaccion, xmlParam.ToString());
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getInventario, cadenaConexion, inv.Transaccion, xmlParam.ToString());
             List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
 
 
@@ -91,7 +134,43 @@ namespace api_grupo10.Controllers
                     Console.WriteLine("Error en api: ", ex.ToString());
                 }
             }
+            return Ok(msgList);
+        }
 
+        [Route("[action]")]
+        [HttpPatch]
+        public async Task<ActionResult<RespuestaLeyenda>> UpdateInventario(InventarioPiezas inv)
+        {
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
+
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(inv);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getInventario, cadenaConexion, inv.Transaccion, xmlParam.ToString());
+            List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
+
+
+            if (dbResult.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        RespuestaLeyenda invent = new()
+                        {
+                            Respuesta = row["respuesta"].ToString(),
+                            Leyenda = row["leyenda"].ToString(),
+                        };
+                        Console.WriteLine(invent);
+                        msgList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error en api: ", ex.ToString());
+                }
+            }
             return Ok(msgList);
         }
     }
