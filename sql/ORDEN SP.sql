@@ -39,7 +39,7 @@ BEGIN
 			values(@tarea,@fecha,@estado,@cliente,@empleado_asignado);
 
 			SET @respuesta = 'Ok';
-			SET @leyenda = 'Se guardo la tarea '+@tarea+' correctamente';
+			SET @leyenda = 'Se guardo la orden '+@tarea+' correctamente';
 		END
 
 		IF(@Transaccion = 'DELETE_ORDEN_BY_ID')
@@ -47,10 +47,10 @@ BEGIN
 			
 			SET @id = (select @XML.value('(/Orden/Id)[1]','INT'))
 
-			DELETE FROM inventario where id = @id;
+			DELETE FROM orden where id = @id;
 
 			SET @respuesta = 'Ok';
-			SET @leyenda = 'Se elimino producto con id '+@id+' correctamente';
+			SET @leyenda = 'Se elimino la orden correctamente';
 		END
 
 		IF(@Transaccion = 'UPDATE_ORDEN_BY_ID')

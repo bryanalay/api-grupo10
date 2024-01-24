@@ -11,7 +11,7 @@ BEGIN
 	DECLARE @cantidad as int;
 	DECLARE @respuesta as VARCHAR(10);
 	DECLARE @leyenda AS VARCHAR(100);
-
+	DECLARE @id AS INT;
 	BEGIN TRY
 
 		IF(@Transaccion = 'GET_INVENTARIO')
@@ -51,11 +51,11 @@ BEGIN
 			SET @descripcion = (select @XML.value('(/InventarioPiezas/Descripcion)[1]','varchar(50)'))
 			SET @cantidad = (select @XML.value('(/InventarioPiezas/Cantidad)[1]','INT'))
 			SET @id = (select @XML.value('(/InventarioPiezas/Id)[1]','int'))
-			UPDATE orden
+			UPDATE inventario
 			SET 
 				nombre = @nombre,
 				descripcion = @descripcion,
-				cantidad = @cantidad,
+				cantidad = @cantidad
 
 			WHERE id = @id;
 
