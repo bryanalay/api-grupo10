@@ -9,5 +9,6 @@ namespace TallerTecnico
         public string? Descripcion {  get; set; }
         public int Cantidad { get; set; }
         public string? Transaccion { get; set; }
+        public int Tipo { get; set; }
     }
 }

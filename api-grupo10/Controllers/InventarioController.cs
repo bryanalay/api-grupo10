@@ -43,7 +43,8 @@ namespace api_grupo10.Controllers
                             Id = Convert.ToInt32(row["id"]),
                             Nombre = row["nombre"].ToString(),
                             Descripcion = row["descripcion"].ToString(),
-                            Cantidad = Convert.ToInt32(row["cantidad"])
+                            Cantidad = Convert.ToInt32(row["cantidad"]),
+                            Tipo = Convert.ToInt32(row["tipo"]),
                         };
                         invList.Add(invent);
                     }

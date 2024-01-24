@@ -75,6 +75,19 @@ BEGIN
 			SET @leyenda = 'Se actualizo orden con id '+CAST(@id AS VARCHAR)+' correctamente';
 		END
 
+		IF(@Transaccion = 'UPDATE_EMPLEADO_BY_ID')
+		BEGIN
+			SET @empleado_asignado = (select @XML.value('(/Orden/EmpleadoAsignado)[1]','varchar(50)'))
+			SET @id = (select @XML.value('(/Orden/Id)[1]','int'))
+			UPDATE orden
+			SET 		
+				empleado_asignado = @empleado_asignado
+			WHERE id = @id;
+
+			SET @respuesta = 'Ok';
+			SET @leyenda = 'Se asigno empleado a orden con id '+CAST(@id AS VARCHAR)+' correctamente';
+		END
+
 	END TRY
 	BEGIN CATCH
 	END CATCH

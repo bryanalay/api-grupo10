@@ -4,21 +4,24 @@ create table inventario(
 	id INT PRIMARY KEY IDENTITY(1,1),
 	nombre varchar(50),
 	descripcion varchar(50),
-	cantidad int
+	cantidad int,
+	tipo int
 );
 
-INSERT INTO inventario (nombre, descripcion, cantidad)
+INSERT INTO inventario (nombre, descripcion, cantidad, tipo)
 VALUES
-    ('Herramienta de corte', 'Sierra circular para madera', 5),
-    ('Material de soldadura', 'Electrodos para soldadura de arco', 100),
-    ('Tornillos', 'Tornillos de acero inoxidable, tamaño 1/4"', 500),
-    ('Pintura', 'Lata de pintura acrílica, color negro', 10),
-    ('Tableros de madera', 'Tableros contrachapados de 3/4"', 15),
-    ('Llaves ajustables', 'Juego de llaves ajustables de diferentes tamaños', 8),
-    ('Brocas para metal', 'Juego de brocas HSS para metal, tamaño 1-10mm', 20),
-    ('Cinta métrica', 'Cinta métrica de 5 metros', 12),
-    ('Guantes de trabajo', 'Guantes de trabajo resistentes', 50),
-    ('Pegamento industrial', 'Adhesivo instantáneo para materiales diversos', 30);
+('Procesador Intel i7', 'Pieza para computadora', 20, 1),
+('Tarjeta madre ASUS', 'Pieza principal de la computadora', 15, 1),
+('Memoria RAM DDR4 8GB', 'Pieza para mejorar el rendimiento', 30, 1),
+('Tornillos para ensamblaje', 'Material para ensamblar equipos', 500, 2),
+('Cables de conexión SATA', 'Material para conexiones internas', 100, 2),
+('Pegamento conductivo', 'Material para reparaciones', 10, 2),
+('Disco SSD 500GB', 'Pieza para almacenamiento rápido', 12, 1),
+('Kit de herramientas básicas', 'Material para reparaciones generales', 5, 2),
+('Ventilador de refrigeración', 'Pieza para evitar el sobrecalentamiento', 18, 1),
+('Placas de circuito impreso (PCB)', 'Material para prototipos electrónicos', 25, 2);
+
+
 
 select * from inventario;
 
@@ -56,10 +59,12 @@ create table orden(
 -- Insertar 5 órdenes con datos ficticios
 INSERT INTO orden (tarea, fecha, estado, cliente, empleado_asignado)
 VALUES
-('Instalación de software', '2024-01-20', 'En progreso', 'Cliente1', 'Empleado1'),
-('Mantenimiento de hardware', '2024-01-21', 'Pendiente', 'Cliente2', 'Empleado2'),
-('Actualización de sistema', '2024-01-22', 'Completada', 'Cliente3', 'Empleado3'),
-('Reparación de impresora', '2024-01-23', 'En espera', 'Cliente4', 'Empleado4'),
-('Configuración de red', '2024-01-24', 'Pendiente', 'Cliente5', 'Empleado5');
+('Desarrollo de aplicación móvil', '2024-01-20', 'En progreso', 'Acme Corp', 'Juan Pérez'),
+('Diseño de página web', '2024-01-21', 'Pendiente', 'ABC Ltd.', 'Ana Gómez'),
+('Configuración de servidores', '2024-01-22', 'Completada', 'XYZ Inc.', 'Carlos Rodríguez'),
+('Soporte técnico remoto', '2024-01-23', 'En espera', 'Tech Solutions', 'María López'),
+('Optimización de base de datos', '2024-01-24', 'Pendiente', 'Global Tech', 'Eduardo García');
+
 
 select * from orden;
+delete from orden;

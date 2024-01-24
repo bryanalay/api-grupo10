@@ -9,6 +9,7 @@ BEGIN
 	DECLARE @nombre as varchar(50);
 	DECLARE @descripcion as varchar(50);
 	DECLARE @cantidad as int;
+	DECLARE @tipo as int;
 	DECLARE @respuesta as VARCHAR(10);
 	DECLARE @leyenda AS VARCHAR(100);
 	DECLARE @id AS INT;
@@ -26,9 +27,10 @@ BEGIN
 			SET @nombre = (select @XML.value('(/InventarioPiezas/Nombre)[1]','varchar(50)'))
 			SET @descripcion = (select @XML.value('(/InventarioPiezas/Descripcion)[1]','varchar(50)'))
 			SET @cantidad = (select @XML.value('(/InventarioPiezas/Cantidad)[1]','INT'))
+			SET @tipo = (select @XML.value('(/InventarioPiezas/Tipo)[1]','INT'))
 
-			INSERT INTO inventario(nombre,descripcion,cantidad)
-			values(@nombre,@descripcion,@cantidad);
+			INSERT INTO inventario(nombre,descripcion,cantidad, tipo)
+			values(@nombre,@descripcion,@cantidad,@tipo);
 
 			SET @respuesta = 'Ok';
 			SET @leyenda = 'Se guardo '+@nombre+' correctamente';

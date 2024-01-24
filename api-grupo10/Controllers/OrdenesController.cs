@@ -173,5 +173,48 @@ namespace api_grupo10.Controllers
             }
             return Ok(msgList);
         }
+
+        [Route("[action]")]
+        [HttpPatch]
+        public async Task<ActionResult<RespuestaLeyenda>> UpdateOrdenEmpleadoAsignado(int id,string empleado)
+        {
+            var cadenaConexion = new ConfigurationBuilder()
+                .AddJsonFile("appsettings.json")
+                .Build()
+                .GetSection("ConnectionStrings")["Conexion"];
+
+            Orden orden = new Orden
+            {
+                Id = id,
+                EmpleadoAsignado = empleado
+            };
+
+            XDocument xmlParam = Shared.DBXmlMethods.GetXml(orden);
+            DataSet dbResult = await Shared.DBXmlMethods.EjecutaBase(Shared.StoredProcedures.getOrdenes, cadenaConexion, "UPDATE_EMPLEADO_BY_ID", xmlParam.ToString());
+            List<RespuestaLeyenda> msgList = new List<RespuestaLeyenda>();
+
+
+            if (dbResult.Tables.Count > 0)
+            {
+                try
+                {
+                    foreach (DataRow row in dbResult.Tables[0].Rows)
+                    {
+                        RespuestaLeyenda invent = new()
+                        {
+                            Respuesta = row["respuesta"].ToString(),
+                            Leyenda = row["leyenda"].ToString(),
+                        };
+                        Console.WriteLine(invent);
+                        msgList.Add(invent);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Error en api: ", ex.ToString());
+                }
+            }
+            return Ok(msgList);
+        }
     }
 }
